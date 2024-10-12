@@ -190,10 +190,13 @@ impl EventContext {
     }
 
     /// Unobserve any property associated with `id`.
-    pub fn unobserve_property(&self, id: u64) -> Result<()> {
-        mpv_err((), unsafe {
-            libmpv2_sys::mpv_unobserve_property(self.ctx.as_ptr(), id)
-        })
+    pub fn unobserve_property(&self, id: u64) -> Result<i32> {
+        let ret = unsafe { libmpv2_sys::mpv_unobserve_property(self.ctx.as_ptr(), id) };
+        if ret >= 0 {
+            Ok(ret)
+        } else {
+            Err(Error::Raw(ret))
+        }
     }
 
     /// Wait for `timeout` seconds for an `Event`. Passing `0` as `timeout` will poll.
